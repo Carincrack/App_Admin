@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Hacienda Hansen">
+  <link rel="apple-touch-icon" href="/logo.jpg">
+  <link rel="manifest" href="/manifest.json">
+  <title>Control de Horas - Hacienda Hansen</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">
+         <img src="https://i.ibb.co/mCDdH6wt/logo.jpg" alt="Hacienda Hansen Logo">
+      </div>
+      <h1>Hacienda Hansen</h1>
+      <p class="subtitle">Sistema de Control de Horas de Empleados</p>
+    </div>
+
+    <div class="stats-grid" id="stats">
+      <!-- Las estadísticas se cargarán aquí -->
+    </div>
+
+    <div class="employees-grid" id="resultado">
+      <div class="loading">
+        <i class="fas fa-spinner"></i>
+        <p>Cargando información de empleados...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para mensajes -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-icon" id="modalIcon">
+          <i id="modalIconSymbol"></i>
+        </div>
+        <h3 class="modal-title" id="modalTitle"></h3>
+      </div>
+      <div class="modal-content">
+        <p class="modal-message" id="modalMessage"></p>
+      </div>
+      <div class="modal-buttons" id="modalButtons">
+        <!-- Los botones se generarán dinámicamente -->
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
