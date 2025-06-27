@@ -1,0 +1,20 @@
+{
+  "name": "Control de Horas - Hacienda Hansen",
+  "short_name": "Hacienda Hansen",
+  "description": "Sistema de control de horas de empleados para Hacienda Hansen",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#667eea",
+  "theme_color": "#2E8B57",
+  "categories": ["productivity", "business"],
+  "lang": "es-ES",
+  "scope": "/",
+  "icons": [
+    { "src": "/logos/logo2-180.png", "sizes": "180x180", "type": "image/png", "purpose": "any" },
+    { "src": "/logos/logo2-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "splash_screen": {
+    "background_color": "#667eea",
+    "image": "/logos/logo2-512.png"
+  }
+}
