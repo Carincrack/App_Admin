@@ -2,10 +2,10 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Hacienda Hansen">
+  <meta name="apple-mobile-web-app-title" content="Control de Horas - Hacienda Hansen">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#2E8B57">
   <meta name="msapplication-navbutton-color" content="#2E8B57">
@@ -26,10 +26,24 @@
   <link id="apple-touch-icon-180" rel="apple-touch-icon" sizes="180x180" href="">
 
   <!-- Manifest -->
-  <link rel="manifest" href="/manifest.json">
+  <link rel="manifest" href="#manifest">
 
   <title>Control de Horas - Hacienda Hansen</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script type="application/json" id="manifest">
+    {
+      "name": "Control de Horas - Hacienda Hansen",
+      "short_name": "Hacienda Hansen",
+      "description": "Sistema de control de horas de empleados para Hacienda Hansen",
+      "start_url": "/index.html",
+      "display": "standalone",
+      "background_color": "#667eea",
+      "theme_color": "#2E8B57",
+      "categories": ["productivity", "business"],
+      "lang": "es-ES",
+      "scope": "/"
+    }
+  </script>
   <style>
     * {
       margin: 0;
@@ -91,6 +105,24 @@
       color: #7f8c8d;
       font-size: 1.1rem;
       font-weight: 300;
+    }
+
+    .pwa-features {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+      text-align: center;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: none;
+    }
+
+    .pwa-features p {
+      color: #2c3e50;
+      margin-bottom: 15px;
+      font-size: 1rem;
     }
 
     .stats-grid {
@@ -288,6 +320,17 @@
       gap: 8px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+    }
+
+    .btn-install {
+      background: linear-gradient(45deg, #9b59b6, #8e44ad);
+      color: white;
+    }
+
+    .btn-install:hover {
+      background: linear-gradient(45deg, #8e44ad, #732d91);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(155, 89, 182, 0.3);
     }
 
     .btn-cancel {
@@ -568,10 +611,18 @@
   <div class="container">
     <div class="header">
       <div class="logo">
-        <img src="https://i.ibb.co/mCDdH6wt/logo.jpg" alt="Hacienda Hansen Logo">
+        <img src="/logos/logo.jpg" alt="Hacienda Hansen Logo">
       </div>
       <h1>Hacienda Hansen</h1>
       <p class="subtitle">Sistema de Control de Horas de Empleados</p>
+    </div>
+
+    <div class="pwa-features" id="pwa-features">
+      <i class="fas fa-mobile-alt"></i>
+      <p>¡Instala la aplicación para usar sin conexión!</p>
+      <button id="install-button" class="btn btn-install">
+        <i class="fas fa-download"></i> Instalar App
+      </button>
     </div>
 
     <div class="stats-grid" id="stats">
@@ -607,19 +658,9 @@
   <script>
     const PWA_VERSION = '2.0.0';
     const CACHE_NAME = `hacienda-hansen-control-v${PWA_VERSION}`;
-    const LOGO_URL = 'https://i.ibb.co/mCDdH6wt/logo.jpg';
     const BIN_ID = "6859f6548a456b7966b466c6";
     const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
     const MASTER_KEY = "$2a$10$CJN48O6SvqnObn0Z0zy0j.Vronnf/8J5ntOTNT5f4ZMhCsRguKcNe";
-
-    const statsGrid = document.getElementById('stats');
-    const resultado = document.getElementById('resultado');
-    const modalOverlay = document.getElementById('modalOverlay');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalMessage = document.getElementById('modalMessage');
-    const modalIconSymbol = document.getElementById('modalIconSymbol');
-    const modalButtons = document.getElementById('modalButtons');
-    const offlineIndicator = document.getElementById('offline-indicator');
 
     // Generar iconos de diferentes tamaños
     async function generateIcon(size) {
@@ -654,7 +695,7 @@
           canvas.toBlob(resolve, 'image/png');
         };
         
-        img.src = LOGO_URL;
+        img.src = '/logos/logo.jpg';
       });
     }
 
@@ -689,8 +730,42 @@
         return iconUrls;
       } catch (error) {
         console.error('Error generando iconos:', error);
-        return {};
+        return {
+          192: '/logos/logo-192.png',
+          512: '/logos/logo-512.png',
+          180: '/logos/logo-180.png'
+        };
       }
+    }
+
+    // Configurar manifest
+    async function setupManifest(iconUrls) {
+      const manifestElement = document.getElementById('manifest');
+      const manifestData = JSON.parse(manifestElement.textContent);
+      manifestData.icons = [
+        {
+          src: iconUrls[192] || '/logos/logo-192.png',
+          sizes: '192x192',
+          type: 'image/png',
+          purpose: 'any maskable'
+        },
+        {
+          src: iconUrls[512] || '/logos/logo-512.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'any maskable'
+        },
+        {
+          src: iconUrls[180] || '/logos/logo-180.png',
+          sizes: '180x180',
+          type: 'image/png',
+          purpose: 'any'
+        }
+      ];
+
+      const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+      const manifestURL = URL.createObjectURL(manifestBlob);
+      document.querySelector('link[rel="manifest"]').setAttribute('href', manifestURL);
     }
 
     // Service Worker
@@ -699,10 +774,10 @@
       const urlsToCache = [
         '/',
         '/index.html',
-        '/manifest.json',
-        '${LOGO_URL}',
-        '/logo-192.png',
-        '/logo-512.png',
+        '/logos/logo.jpg',
+        '/logos/logo-180.png',
+        '/logos/logo-192.png',
+        '/logos/logo-512.png',
         'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
       ];
 
@@ -752,7 +827,94 @@
         );
         self.clients.claim();
       });
+
+      self.addEventListener('sync', event => {
+        if (event.tag === 'sync-actions') {
+          event.waitUntil(syncPendingActions());
+        }
+      });
+
+      async function syncPendingActions() {
+        try {
+          const pendingActions = JSON.parse(localStorage.getItem('pendingActions') || '[]');
+          if (pendingActions.length === 0) return;
+
+          const res = await fetch('https://api.jsonbin.io/v3/b/6859f6548a456b7966b466c6/latest', {
+            headers: { 'X-Master-Key': '${MASTER_KEY}' }
+          });
+          const data = await res.json();
+          let actuales = data.record || [];
+
+          for (const action of pendingActions) {
+            if (action.action === 'cancel') {
+              const { nombre, fecha } = action.data;
+              actuales = actuales.filter(r => r.nombre !== nombre);
+              actuales.push({ nombre, fecha, totalHoras: 0 });
+            } else if (action.action === 'delete') {
+              const { nombre } = action.data;
+              actuales = actuales.filter(r => r.nombre !== nombre);
+            }
+          }
+
+          const putRes = await fetch('https://api.jsonbin.io/v3/b/6859f6548a456b7966b466c6', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Master-Key': '${MASTER_KEY}'
+            },
+            body: JSON.stringify(actuales)
+          });
+
+          if (putRes.ok) {
+            localStorage.setItem('cachedRegistros', JSON.stringify(actuales));
+            localStorage.removeItem('pendingActions');
+            self.registration.showNotification('Hacienda Hansen', {
+              body: 'Acciones pendientes sincronizadas correctamente',
+              icon: '/logos/logo-192.png',
+              badge: '/logos/logo-192.png'
+            });
+          }
+        } catch (error) {
+          console.error('Error en sincronización:', error);
+        }
+      }
     `;
+
+    const statsGrid = document.getElementById('stats');
+    const resultado = document.getElementById('resultado');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalMessage = document.getElementById('modalMessage');
+    const modalIconSymbol = document.getElementById('modalIconSymbol');
+    const modalButtons = document.getElementById('modalButtons');
+    const offlineIndicator = document.getElementById('offline-indicator');
+    const installButton = document.getElementById('install-button');
+    const pwaFeatures = document.getElementById('pwa-features');
+
+    let deferredPrompt;
+
+    // Manejar instalación de PWA
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      pwaFeatures.style.display = 'block';
+      installButton.style.display = 'inline-flex';
+    });
+
+    installButton.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log('Resultado de instalación:', outcome);
+        deferredPrompt = null;
+        pwaFeatures.style.display = 'none';
+      }
+    });
+
+    window.addEventListener('appinstalled', () => {
+      console.log('PWA instalada exitosamente');
+      pwaFeatures.style.display = 'none';
+    });
 
     // Registrar Service Worker
     async function registerServiceWorker() {
@@ -762,6 +924,9 @@
           const swURL = URL.createObjectURL(swBlob);
           const registration = await navigator.serviceWorker.register(swURL);
           console.log('Service Worker registrado:', registration);
+          if ('sync' in navigator.serviceWorker.registration) {
+            registration.sync.register('sync-actions');
+          }
           return registration;
         } catch (error) {
           console.error('Error registrando Service Worker:', error);
@@ -778,7 +943,7 @@
         ? '<i class="fas fa-wifi"></i> Conectado'
         : '<i class="fas fa-wifi"></i> Sin conexión';
       if (isOnline) {
-        render();
+        sincronizarAccionesPendientes();
       }
     }
 
@@ -789,23 +954,20 @@
     // Sistema de modales
     function showModal(options) {
       return new Promise((resolve) => {
-        const overlay = document.getElementById('modalOverlay');
+        const overlay = modalOverlay;
         const icon = document.getElementById('modalIcon');
-        const iconSymbol = document.getElementById('modalIconSymbol');
-        const title = document.getElementById('modalTitle');
-        const message = document.getElementById('modalMessage');
-        const buttonsContainer = document.getElementById('modalButtons');
+        const iconSymbol = modalIconSymbol;
+        const title = modalTitle;
+        const message = modalMessage;
+        const buttonsContainer = modalButtons;
 
-        // Configurar el modal
         icon.className = `modal-icon ${options.type || 'question'}`;
         iconSymbol.className = options.icon || 'fas fa-question';
         title.textContent = options.title || 'Confirmación';
         message.textContent = options.message || '';
 
-        // Limpiar botones anteriores
         buttonsContainer.innerHTML = '';
 
-        // Crear botones
         options.buttons.forEach(button => {
           const btn = document.createElement('button');
           btn.className = `modal-btn ${button.class || 'secondary'}`;
@@ -817,11 +979,9 @@
           buttonsContainer.appendChild(btn);
         });
 
-        // Mostrar modal
         overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
 
-        // Cerrar con ESC
         const handleEsc = (e) => {
           if (e.key === 'Escape') {
             hideModal();
@@ -831,7 +991,6 @@
         };
         document.addEventListener('keydown', handleEsc);
 
-        // Cerrar al hacer clic fuera del modal
         overlay.onclick = (e) => {
           if (e.target === overlay) {
             hideModal();
@@ -842,13 +1001,11 @@
     }
 
     function hideModal() {
-      const overlay = document.getElementById('modalOverlay');
-      overlay.classList.remove('active');
+      modalOverlay.classList.remove('active');
       document.body.style.overflow = '';
-      overlay.onclick = null;
+      modalOverlay.onclick = null;
     }
 
-    // Funciones auxiliares para diferentes tipos de modales
     function showSuccess(title, message) {
       return showModal({
         type: 'success',
@@ -939,13 +1096,45 @@
           body: JSON.stringify(nuevosDatos)
         });
         if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Error guardando datos: ${response.status} ${errorText}`);
+          throw new Error(`Error guardando datos: ${response.status}`);
         }
         localStorage.setItem('cachedRegistros', JSON.stringify(nuevosDatos));
       } catch (error) {
         console.error('Error guardando datos:', error);
         throw error;
+      }
+    }
+
+    async function sincronizarAccionesPendientes() {
+      if (!navigator.onLine) return;
+      const pendingActions = JSON.parse(localStorage.getItem('pendingActions') || '[]');
+      if (pendingActions.length === 0) return;
+
+      try {
+        const res = await fetch(`${API_URL}/latest`, {
+          headers: { "X-Master-Key": MASTER_KEY }
+        });
+        if (!res.ok) throw new Error(`Error al obtener datos: ${res.status}`);
+        const data = await res.json();
+        let actuales = data.record || [];
+
+        for (const action of pendingActions) {
+          if (action.action === 'cancel') {
+            const { nombre, fecha } = action.data;
+            actuales = actuales.filter(r => r.nombre !== nombre);
+            actuales.push({ nombre, fecha, totalHoras: 0 });
+          } else if (action.action === 'delete') {
+            const { nombre } = action.data;
+            actuales = actuales.filter(r => r.nombre !== nombre);
+          }
+        }
+
+        await guardarDatos(actuales);
+        localStorage.removeItem('pendingActions');
+        render();
+      } catch (error) {
+        console.error('Error sincronizando acciones:', error);
+        await showError('Error', 'No se pudieron sincronizar las acciones pendientes');
       }
     }
 
@@ -980,7 +1169,7 @@
         const entradas = agrupado[nombre];
         return !(entradas.length === 1 && entradas[0].totalHoras === 0 && tieneRegistroHoy(entradas));
       }).length;
-      const totalHoras = registros.reduce((acc, r) => acc + r.totalHoras, 0);
+      const totalHoras = registros.reduce((acc, r) => acc + (r.totalHoras || 0), 0);
 
       statsGrid.innerHTML = `
         <div class="stat-card">
@@ -1031,14 +1220,12 @@
 
       renderStats(registros);
 
-      // Agrupar por nombre
       const agrupado = {};
       registros.forEach(r => {
         if (!agrupado[r.nombre]) agrupado[r.nombre] = [];
         agrupado[r.nombre].push(r);
       });
 
-      // Ordenar para mostrar primero los que tienen registro hoy
       const nombres = Object.keys(agrupado);
       nombres.sort((a,b) => {
         const aHoy = tieneRegistroHoy(agrupado[a]) ? 0 : 1;
@@ -1050,14 +1237,12 @@
 
       for (const nombre of nombres) {
         const entradas = agrupado[nombre];
-
-        // Detectar si solo tiene un registro hoy con 0 horas para marcar cancelado
         const hoy = new Date().toISOString().slice(0,10);
         const soloCancelado = entradas.length === 1
           && entradas[0].fecha === hoy
           && entradas[0].totalHoras === 0;
 
-        const total = entradas.reduce((acc, r) => acc + r.totalHoras, 0);
+        const total = entradas.reduce((acc, r) => acc + (r.totalHoras || 0), 0);
         const initials = getInitials(nombre);
 
         let horasListHtml = '';
@@ -1065,7 +1250,7 @@
           horasListHtml += `
             <div class="hours-entry">
               <span class="hours-date">${formatearFecha(r.fecha)}</span>
-              <span class="hours-amount">${r.totalHoras.toFixed(2)}h</span>
+              <span class="hours-amount">${(r.totalHoras || 0).toFixed(2)}h</span>
             </div>
           `;
         });
@@ -1115,27 +1300,38 @@
       if (!confirmado) return;
 
       try {
-        const registros = await obtenerDatos();
         const hoy = new Date().toISOString().slice(0,10);
+        const actionData = { nombre, fecha: hoy };
 
-        // Eliminar todos los registros del trabajador
-        // y dejar solo un registro hoy con totalHoras = 0 para marcar cancelado
-        const nuevosRegistros = registros.filter(r => r.nombre !== nombre);
+        if (!navigator.onLine) {
+          const pendingActions = JSON.parse(localStorage.getItem('pendingActions') || '[]');
+          pendingActions.push({ action: 'cancel', data: actionData });
+          localStorage.setItem('pendingActions', JSON.stringify(pendingActions));
 
-        nuevosRegistros.push({
-          nombre,
-          fecha: hoy,
-          totalHoras: 0
-        });
+          const registros = await obtenerDatos();
+          const nuevosRegistros = registros.filter(r => r.nombre !== nombre);
+          nuevosRegistros.push({ nombre, fecha: hoy, totalHoras: 0 });
+          localStorage.setItem('cachedRegistros', JSON.stringify(nuevosRegistros));
 
-        await guardarDatos(nuevosRegistros);
-        
-        await showSuccess(
-          'Operación Exitosa',
-          `Horas de ${nombre} canceladas y historial reiniciado correctamente.`
-        );
-        
-        render();
+          await showSuccess(
+            'Operación Exitosa',
+            `Horas de ${nombre} canceladas y historial reiniciado (se sincronizará cuando haya conexión).`
+          );
+          render();
+        } else {
+          const registros = await obtenerDatos();
+          const nuevosRegistros = registros.filter(r => r.nombre !== nombre);
+          nuevosRegistros.push({ nombre, fecha: hoy, totalHoras: 0 });
+
+          await guardarDatos(nuevosRegistros);
+          
+          await showSuccess(
+            'Operación Exitosa',
+            `Horas de ${nombre} canceladas y historial reiniciado correctamente.`
+          );
+          
+          render();
+        }
       } catch (error) {
         await showError(
           'Error al Cancelar',
@@ -1153,17 +1349,33 @@
       if (!confirmado) return;
 
       try {
-        const registros = await obtenerDatos();
-        const filtrados = registros.filter(r => r.nombre !== nombre);
+        if (!navigator.onLine) {
+          const pendingActions = JSON.parse(localStorage.getItem('pendingActions') || '[]');
+          pendingActions.push({ action: 'delete', data: { nombre } });
+          localStorage.setItem('pendingActions', JSON.stringify(pendingActions));
 
-        await guardarDatos(filtrados);
-        
-        await showSuccess(
-          'Empleado Eliminado',
-          `${nombre} ha sido eliminado del registro correctamente.`
-        );
-        
-        render();
+          const registros = await obtenerDatos();
+          const filtrados = registros.filter(r => r.nombre !== nombre);
+          localStorage.setItem('cachedRegistros', JSON.stringify(filtrados));
+
+          await showSuccess(
+            'Empleado Eliminado',
+            `${nombre} ha sido eliminado del registro (se sincronizará cuando haya conexión).`
+          );
+          render();
+        } else {
+          const registros = await obtenerDatos();
+          const filtrados = registros.filter(r => r.nombre !== nombre);
+
+          await guardarDatos(filtrados);
+          
+          await showSuccess(
+            'Empleado Eliminado',
+            `${nombre} ha sido eliminado del registro correctamente.`
+          );
+          
+          render();
+        }
       } catch (error) {
         await showError(
           'Error al Eliminar',
@@ -1174,7 +1386,8 @@
 
     // Inicializar
     async function init() {
-      await setupIcons();
+      const iconUrls = await setupIcons();
+      await setupManifest(iconUrls);
       await registerServiceWorker();
       await render();
     }
