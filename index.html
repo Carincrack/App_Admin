@@ -1234,51 +1234,5 @@ body {
 
     init();
   </script>
-  <Script>
-    document.addEventListener('DOMContentLoaded', () => {
-  // Función para inicializar el observador de intersección
-  function initObserver() {
-    const observer = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.remove('hidden');
-          const animationClass = entry.target.dataset.animation || 'fadeIn';
-          entry.target.classList.add(animationClass);
-          observer.unobserve(entry.target);
-        }
-      });
-    }, {
-      threshold: 0.1 // Activa cuando el 10% del elemento es visible
-    });
-
-    // Observar elementos iniciales
-    const initialElements = document.querySelectorAll('.header, .pwa-features, .logo, .stats-grid, .employees-grid, .modal-overlay, .offline-indicator');
-    initialElements.forEach(element => {
-      element.classList.add('hidden');
-      observer.observe(element);
-    });
-  }
-
-  // Re-observar elementos después de renderizar dinámicamente
-  window.addEventListener('renderComplete', () => {
-    const dynamicElements = document.querySelectorAll('.stat-card, .employee-card, .hours-list, .total-hours, .action-buttons, .empty-state, .loading');
-    dynamicElements.forEach(element => {
-      element.classList.add('hidden');
-      observer.observe(element);
-    });
-  });
-
-  // Iniciar observador
-  initObserver();
-
-  // Modificar render para disparar el evento 'renderComplete'
-  const originalRender = render;
-  window.render = async function() {
-    await originalRender();
-    const event = new Event('renderComplete');
-    window.dispatchEvent(event);
-  };
-});
-  </Script>
 </body>
 </html>
