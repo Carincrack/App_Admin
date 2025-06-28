@@ -59,6 +59,7 @@ async function syncPendingActions() {
       }
     }
 
+    
     const putRes = await fetch('https://api.jsonbin.io/v3/b/6859f6548a456b7966b466c6', {
       method: 'PUT',
       headers: {
